@@ -63,17 +63,10 @@ def findInverse(value):
         
     GF = value
     remainder = 0
-    print(GF, value)
     t2 = addPoly(t0, mulPoly(t1, quotient))
     counter = 0
-    binValue = ''
-    while(counter < 8):
-        binValue += str(t2[counter])
-        counter += 1
-    
-    binValue = binValue[::-1]
-    print(binValue)
-    return hex(int(binValue, 2))
+   
+    return t2
 
 def degree(poly):
     while poly and poly[-1] == 0:
@@ -109,10 +102,42 @@ def hextobin(hexval):
     desired_array = [int(numeric_string) for numeric_string in binArray]
     return desired_array
     
-    
+def conversion(inverse):
+    constant = [1, 1, 0, 0, 0, 1, 1, 0]
+    sboxMatrix = [
+                    [1,0,0,0,1,1,1,1],
+                    [1,1,0,0,0,1,1,1],
+                    [1,1,1,0,0,0,1,1],
+                    [1,1,1,1,0,0,0,1],
+                    [1,1,1,1,1,0,0,0],
+                    [0,1,1,1,1,1,0,0],
+                    [0,0,1,1,1,1,1,0],
+                    [0,0,0,1,1,1,1,1]
+                ]
+
+    matrixMultiplication = [0, 0, 0, 0, 0, 0, 0, 0]
+    result = [0, 0, 0, 0, 0, 0, 0, 0]
+    for i in range(8):
+        for j in range(8):
+            matrixMultiplication[i] ^= sboxMatrix[i][j] * int(inverse[j])
+
+    for counter in range(8):
+        result[counter] = matrixMultiplication[counter] ^ constant[counter]
+
+    print(matrixMultiplication)
+    counter = 0
+    print(result)
+    binValue = ''
+    while(counter < 8):
+        binValue += str(result[counter])
+        counter += 1
+
+    binValue = binValue[::-1]
+    return hex(int(binValue, 2))
 
 value = input("Enter a hex value: ")
 inverse = findInverse(hextobin(value))
-print('The inverse is: ', inverse[2::].upper())
+conversionValue = conversion(inverse)
+print('The inverse is: ', conversionValue[2:].upper())
 
 
